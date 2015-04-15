@@ -4,7 +4,7 @@
 
 ### 
 
-    http://localhost:8080/netcdf-subset?typeName=${LAYER_NAME}&CQL_FILTER=INTERSECTS(${GEOMETRY_ATTR},${GEOMETRY_LIT}) AND {$TIMESTAMP_ATTR} >= '${FROM_TIMESTAMP}' AND ($TIMESTAMP_ATTR) <= '${TO_TIMESTAMP}'
+    http://localhost:8080/netcdf-subset/subset?typeName=${LAYER_NAME}&CQL_FILTER=INTERSECTS(${GEOMETRY_ATTR},${GEOMETRY_LIT}) AND {$TIMESTAMP_ATTR} >= '${FROM_TIMESTAMP}' AND ($TIMESTAMP_ATTR) <= '${TO_TIMESTAMP}'
 
 Where 
 

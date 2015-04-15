@@ -1,15 +1,4 @@
-// locations to search for config files that get merged into the main config;
-// config files can be ConfigSlurper scripts, Java properties files, or classes
-// in the classpath in ConfigSlurper format
-
-// grails.config.locations = [ "classpath:${appName}-config.properties",
-//                             "classpath:${appName}-config.groovy",
-//                             "file:${userHome}/.grails/${appName}-config.properties",
-//                             "file:${userHome}/.grails/${appName}-config.groovy"]
-
-// if (System.properties["${appName}.config.location"]) {
-//    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
-// }
+import javax.naming.InitialContext
 
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
@@ -78,6 +67,7 @@ grails.exceptionresolver.params.exclude = ['password']
 
 // configure auto-caching of queries by default (if false you can cache individual queries with 'cache: true')
 grails.hibernate.cache.queries = false
+grails.serverURL = "http://${InetAddress.localHost.hostAddress}:8082/${appName}"
 
 // configure passing transaction's read-only attribute to Hibernate session, queries and criterias
 // set "singleSession = false" OSIV mode in hibernate configuration after enabling
@@ -91,17 +81,46 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        // TODO: grails.serverURL = "http://www.changeme.com"
     }
 }
 
-// log4j configuration
-log4j.main = {
-    // Example of changing the log pattern for the default console appender:
-    //
-    //appenders {
-    //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
-    //}
+/**
+ * Instance specific customisation, clearly stolen from:
+ * http://phatness.com/2010/03/how-to-externalize-your-grails-configuration/
+ *
+ * To use set for a specific instance, either set the environment variable "INSTANCE_NAME", or add this in the grails
+ * commandline like so:
+ *
+ * grails -DINSTANCE_NAME=WA run-app
+ *
+ * Instance specific config files are located in $project_home/instances/
+ *
+ * Any configuration found in these instance specific file will OVERRIDE values set in Config.groovy and
+ * application.properties.
+ *
+ * NOTE: app.name and version is ignored in external application.properties
+ */
+if(!grails.config.locations || !(grails.config.locations instanceof List)) {
+    grails.config.locations = []
+}
+
+try {
+    configurationPath = new InitialContext().lookup('java:comp/env/aodn.configuration')
+    grails.config.locations << "file:${configurationPath}"
+
+    println "Loading external config from '$configurationPath'..."
+}
+catch (e) {
+    println "Not loading external config"
+}
+
+def log4jConversionPattern = '%d [%t] %-5p %c - %m%n'
+
+log4j = {
+    appenders {
+        console name: 'stdout', layout: pattern(conversionPattern: log4jConversionPattern)
+        'null' name: "stacktrace"
+    }
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -114,4 +133,17 @@ log4j.main = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
+    info   'au.org.emii.netcdfsubset'
+
+    environments {
+        development {
+            debug 'grails.app.controllers',
+                  'au.org.emii.netcdfsubset'
+        }
+    }
+
+    root {
+        info 'stdout', 'null'
+    }
 }
