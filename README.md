@@ -1,12 +1,14 @@
 # NetCDF Subset Service
 
+[![Build Status](https://travis-ci.org/aodn/netcdf-subset-service.png?branch=master)](https://travis-ci.org/aodn/netcdf-subset-service)
+
 ## Usage
 
-### 
+###
 
     http://localhost:8080/netcdf-subset/subset?typeName=${LAYER_NAME}&CQL_FILTER=INTERSECTS(${GEOMETRY_ATTR},${GEOMETRY_LIT}) AND {$TIMESTAMP_ATTR} >= '${FROM_TIMESTAMP}' AND ($TIMESTAMP_ATTR) <= '${TO_TIMESTAMP}'
 
-Where 
+Where
 
  * LAYER_NAME is the geoserver layer name
  * GEOMETRY_ATTR is the layer's geometry attribute
