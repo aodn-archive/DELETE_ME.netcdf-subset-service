@@ -7,7 +7,7 @@ import org.springframework.validation.Errors
 
 class SubsetController {
     def subsetService
-    
+
     def messageSource
 
     def index(SubsetRequest subsetRequest) {
@@ -16,7 +16,7 @@ class SubsetController {
         if (subsetRequest.hasErrors()) {
             render(status: 400, text: "Invalid request: ${getAllErrors(subsetRequest.errors)}")
             return
-        } 
+        }
 
         response.setContentType("application/octet-stream")
         response.setHeader("Content-disposition", "filename=${filenameToServe(subsetRequest)}")
