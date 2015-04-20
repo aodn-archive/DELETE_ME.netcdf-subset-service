@@ -35,11 +35,14 @@ grails.project.dependency.resolution = {
         mavenLocal()
         grailsCentral()
         mavenCentral()
+
+        mavenRepo 'https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/'
     }
 
     dependencies {
         runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
+        runtime 'edu.ucar:netcdf:4.3.22'
     }
 
     plugins {
