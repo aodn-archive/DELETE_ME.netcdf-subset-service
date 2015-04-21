@@ -9,11 +9,15 @@ class SubsetService {
 
     def subset(typeName, cqlFilter, response) {
 
-        NcdfGenerator generator = new NcdfGenerator(
-            grailsApplication.config.netcdf_filters.layer_config_dir,
-            System.getProperty('java.io.tmpdir')
-        )
+        def generator = _getGenerator()
 
         generator.write(typeName, cqlFilter, dataSource.connection, response)
+    }
+
+    def _getGenerator = { ->
+         new NcdfGenerator(
+                grailsApplication.config.netcdf_filters.layer_config_dir,
+                System.getProperty('java.io.tmpdir')
+        )
     }
 }
