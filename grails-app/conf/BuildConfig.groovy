@@ -35,21 +35,17 @@ grails.project.dependency.resolution = {
         mavenLocal()
         grailsCentral()
         mavenCentral()
-
-        mavenRepo 'https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/'
+        mavenRepo 'https://jenkins.aodn.org.au/plugin/repository/everything'
     }
 
     dependencies {
+        compile 'au.org.emii:ncdfgenerator:1.0.0'
         runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-        runtime 'edu.ucar:netcdf:4.3.22'
     }
 
     plugins {
-        // plugins for the build system only
         build ":tomcat:7.0.55"
-
-        // plugins for the compile step
         compile ":scaffolding:2.1.2"
         compile ":joda-time:1.5"
     }
