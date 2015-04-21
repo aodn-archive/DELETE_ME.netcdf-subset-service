@@ -30,7 +30,7 @@ Example (using `curl` and encoding URL parameters):
 
 ```
 $ curl -L "http://localhost:8080/netcdf-subset/subset" \
-       --data-urlencode "typeName=anmn_ts_timeseries_data" \
+       --data-urlencode "typeName=anmn_timeseries" \
        --data-urlencode "CQL_FILTER=INTERSECTS(geom,POLYGON((113.33 -33.09,113.33 -30.98,117.11 -30.98,117.11 -33.09,113.33 -33.09))) AND TIME >= '2015-01-13T23:00:00Z' AND TIME <= '2015-04-14T00:00:00Z'" \
        > test.zip 2> /dev/null
 
