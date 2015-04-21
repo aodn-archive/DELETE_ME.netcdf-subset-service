@@ -26,6 +26,7 @@ class SubsetController {
         }
         catch (Exception e) {
             log.error "Unhandled exception during subset", e
+            render status: 500, text: "Invalid request for typeName: " + subsetRequest.typeName
         }
     }
 
