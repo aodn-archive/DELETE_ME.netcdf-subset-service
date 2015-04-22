@@ -75,7 +75,7 @@ grails.hibernate.pass.readonly = false
 // configure passing read-only to OSIV session by default, requires "singleSession = false" OSIV mode
 grails.hibernate.osiv.readonly = false
 
-netcdf_filters.layer_config_dir = "../netcdf_filters/src/test/resources"
+ncdfgenerator.layerConfigDir = System.getProperty('java.io.tmpdir')
 
 environments {
     development {
