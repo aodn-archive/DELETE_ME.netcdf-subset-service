@@ -4,6 +4,8 @@ import au.org.emii.ncdfgenerator.*
 
 class SubsetService {
 
+    static transactional = false
+
     def dataSource
     def grailsApplication
 
