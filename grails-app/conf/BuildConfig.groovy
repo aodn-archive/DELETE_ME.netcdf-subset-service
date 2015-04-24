@@ -30,16 +30,18 @@ grails.project.dependency.resolution = {
     repositories {
         inherits true
 
+        mavenRepo 'https://jenkins.aodn.org.au/plugin/repository/everything', {
+            updatePolicy 'always'
+        }
         grailsPlugins()
         grailsHome()
         mavenLocal()
         grailsCentral()
         mavenCentral()
-        mavenRepo 'https://jenkins.aodn.org.au/plugin/repository/everything'
     }
 
     dependencies {
-        compile 'au.org.emii:ncdfgenerator:1.0.0'
+        compile 'au.org.emii:ncdfgenerator:1.0.0-SNAPSHOT'
         runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
     }
