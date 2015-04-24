@@ -16,7 +16,7 @@ class SubsetServiceSpec extends Specification {
     def response
 
     def setup() {
-        typeName = "anmn_timeseries.xml"
+        typeName = "anmn_timeseries"
         cqlFilter = "INTERSECTS()"
         response = new OutputStream() {
             @Override
