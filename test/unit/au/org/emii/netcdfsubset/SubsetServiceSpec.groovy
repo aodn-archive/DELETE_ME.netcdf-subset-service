@@ -1,29 +1,33 @@
 package au.org.emii.netcdfsubset
 
 import au.org.emii.ncdfgenerator.NcdfGenerator
-import au.org.emii.netcdfsubset.SubsetService
 import grails.test.mixin.TestFor
 import spock.lang.Specification
 import javax.sql.DataSource
+import java.sql.Connection
 
 @TestFor(SubsetService)
 class SubsetServiceSpec extends Specification {
 
     def ncdfGenerator
-    def typeName
+    def writeCallCount = 0
+    def typeName = "anmn_ts"
     def dataSource
-    def cqlFilter
-    def response
+    def cqlFilter = "INTERSECTS()"
+    def response = [:] as OutputStream
 
     def setup() {
-        typeName = "anmn_timeseries"
-        cqlFilter = "INTERSECTS()"
-        response = new OutputStream() {
-            @Override
-            void write(int b) throws IOException {}
+        ncdfGenerator = new NcdfGenerator(null, null)
+        ncdfGenerator.metaClass.write = { String typename, String filterExpr, Connection conn, OutputStream os ->
+            assertEquals typeName, typename
+            assertEquals cqlFilter, filterExpr
+            assertEquals dataSource.connection, conn
+            assertEquals response, os
+
+            writeCallCount++
         }
-        ncdfGenerator = Mock(NcdfGenerator)
         service._getGenerator = {-> ncdfGenerator}
+
         dataSource = Mock(DataSource)
         service.dataSource = dataSource
     }
@@ -33,6 +37,6 @@ class SubsetServiceSpec extends Specification {
         service.subset(typeName, cqlFilter, response)
 
         then:
-        1 * ncdfGenerator.write(typeName, cqlFilter, dataSource.connection, response)
+        assertEquals 1, writeCallCount
     }
 }
