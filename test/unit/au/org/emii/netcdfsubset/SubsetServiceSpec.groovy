@@ -10,22 +10,14 @@ import java.sql.Connection
 class SubsetServiceSpec extends Specification {
 
     def ncdfGenerator
-    def writeCallCount
-    def typeName
+    def writeCallCount = 0
+    def typeName = "anmn_ts"
     def dataSource
-    def cqlFilter
-    def response
+    def cqlFilter = "INTERSECTS()"
+    def response = [:] as OutputStream
 
     def setup() {
-        typeName = "anmn_ts"
-        cqlFilter = "INTERSECTS()"
-        response = new OutputStream() {
-            @Override
-            void write(int b) throws IOException {}
-        }
-
         ncdfGenerator = new NcdfGenerator(null, null)
-        writeCallCount = 0
         ncdfGenerator.metaClass.write = { String typename, String filterExpr, Connection conn, OutputStream os ->
             assertEquals typeName, typename
             assertEquals cqlFilter, filterExpr
