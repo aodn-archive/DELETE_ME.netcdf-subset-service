@@ -5,10 +5,12 @@ import org.joda.time.*
 import org.joda.time.format.*
 import org.springframework.validation.Errors
 
+import java.util.concurrent.*
+
 class SubsetController {
     def subsetService
-
     def messageSource
+    static def mutex = new Semaphore(1, true)
 
     def index(SubsetRequest subsetRequest) {
         log.debug("command: ${subsetRequest}")
@@ -21,13 +23,29 @@ class SubsetController {
         response.setContentType("application/octet-stream")
         response.setHeader("Content-disposition", "filename=${filenameToServe(subsetRequest)}")
 
-        try {
-            subsetService.subset(subsetRequest.typeName, subsetRequest.CQL_FILTER, response.outputStream)
+        if (isThreadAvailable()) {
+            try {
+                getThreadLock()
+                subsetService.subset(subsetRequest.typeName, subsetRequest.CQL_FILTER, response.outputStream)
+            }
+            catch (InterruptedException e) {
+                log.info "The maximum number of concurrent jobs has been exceeded", e
+                render status: 503, text: "The maximum number of concurrent jobs has been exceeded, please try again later"
+            }
+            catch (Exception e) {
+                log.error "Unhandled exception during subset", e
+                releaseThreadLock()
+                render status: 500, text: "Invalid request for typeName: " + subsetRequest.typeName
+            }
+            finally {
+                releaseThreadLock()
+            }
         }
-        catch (Exception e) {
-            log.error "Unhandled exception during subset", e
-            render status: 500, text: "Invalid request for typeName: " + subsetRequest.typeName
+        else {
+            log.info "The maximum number of concurrent jobs has been exceeded"
+            render status: 503, text: "The maximum number of concurrent jobs has been exceeded, please try again later"
         }
+
     }
 
     private String filenameToServe(subsetRequest) {
@@ -47,4 +65,15 @@ class SubsetController {
         }
     }
 
+    private void getThreadLock() throws InterruptedException {
+        mutex.acquire()
+    }
+
+    private void releaseThreadLock() {
+        mutex.release()
+    }
+
+    private boolean isThreadAvailable() {
+        return (mutex.availablePermits() > 0)
+    }
 }
