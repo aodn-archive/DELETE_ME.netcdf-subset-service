@@ -1,14 +1,13 @@
 package au.org.emii.netcdfsubset
 
-import grails.validation.Validateable
 import org.joda.time.*
 import org.joda.time.format.*
 import org.springframework.validation.Errors
 
 class SubsetController {
     def subsetService
-
     def messageSource
+    static def jobCount = 0
 
     def index(SubsetRequest subsetRequest) {
         log.debug("command: ${subsetRequest}")
@@ -21,13 +20,23 @@ class SubsetController {
         response.setContentType("application/octet-stream")
         response.setHeader("Content-disposition", "filename=${filenameToServe(subsetRequest)}")
 
-        try {
-            subsetService.subset(subsetRequest.typeName, subsetRequest.CQL_FILTER, response.outputStream)
+        if (registerJob(grailsApplication.config.ncdfgenerator.maxConcurrentJobs)) {
+            try {
+                subsetService.subset(subsetRequest.typeName, subsetRequest.CQL_FILTER, response.outputStream)
+            }
+            catch (Exception e) {
+                log.error "Unhandled exception during subset", e
+                render status: 500, text: "Invalid request for typeName: " + subsetRequest.typeName
+            }
+            finally {
+                unregisterJob()
+            }
         }
-        catch (Exception e) {
-            log.error "Unhandled exception during subset", e
-            render status: 500, text: "Invalid request for typeName: " + subsetRequest.typeName
+        else {
+            log.info "The maximum number of concurrent jobs has been exceeded"
+            render status: 503, text: "The maximum number of concurrent jobs has been exceeded, please try again later"
         }
+
     }
 
     private String filenameToServe(subsetRequest) {
@@ -47,4 +56,19 @@ class SubsetController {
         }
     }
 
+    private synchronized static boolean registerJob(maxConcurrentJobs) {
+        if (jobCount < maxConcurrentJobs) {
+            jobCount++
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
+    private synchronized static void unregisterJob() {
+        if (jobCount > 0) {
+            jobCount--
+        }
+    }
 }

@@ -76,6 +76,7 @@ grails.hibernate.pass.readonly = false
 grails.hibernate.osiv.readonly = false
 
 ncdfgenerator.layerConfigDir = System.getProperty('java.io.tmpdir')
+ncdfgenerator.maxConcurrentJobs = 1
 
 environments {
     development {
