@@ -5,3 +5,7 @@ target
 target-eclipse
 web-app/WEB-INF/tld
 
+# Include code style settings for IntelliJ IDEA projects
+.idea/*
+!.idea/codeStyleSettings.xml
+*.iml
